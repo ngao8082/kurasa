@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
 {
+    protected $table='suppliers';
+    protected $fillable = [
+        'name',
+        'phone',
+        'location',
+        'supermarket_id'
+    ];
     use HasFactory;
 }

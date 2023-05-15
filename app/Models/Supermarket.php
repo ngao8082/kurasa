@@ -20,6 +20,7 @@ class Supermarket extends Model
 
     public function managers()
     {
+        return $this->belongsTo(Manager::class);
         return $this->hasMany(Manager::class);
     }
 

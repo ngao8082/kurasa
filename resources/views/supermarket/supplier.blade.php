@@ -1,10 +1,11 @@
-@extends('ui.layouts.app', ['title' => 'import Employee'])
+@extends('ui.layouts.app', ['title' => 'import Supplier'])
 
 @section('content')
     <div class="row flex-grow">
         <div class="col-md-4 mx-auto">
             <div class="auth-form-light p-5 border border-dark">
-                <form method="POST" action="{{route('supermarket.employeefile')}}" enctype="multipart/form-data" novalidate>
+                <h5>Supplier upload</h5>
+                <form method="POST" action="{{route('supermarket.supplierfile')}}" enctype="multipart/form-data" novalidate>
                     @csrf
                     <div class="form-group">
                         <label for="name" class="sr-only">Name</label>

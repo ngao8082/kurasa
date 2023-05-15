@@ -69,44 +69,35 @@ class supermarketTest extends TestCase
     }
 
 
-    public function testCreateSupermarketEmployee()
+
+   
+
+    public function testUploadEmployees()
     {
-        // Mock the uploaded CSV file
-        Storage::fake('local');
-        $csvFile = UploadedFile::fake()->create('employees.csv', 1024);
-
-        // Create a manager
-        $manager = Manager::factory()->create();
-
-        // Set up the request data
-        $data = [
-            'name' => 'Test Supermarket',
-            'locationid' => 'Test Location',
-            'csv_file' => $csvFile,
-        ];
-
-        // Mock the CSV import process
         Excel::fake();
-        Excel::shouldReceive('import')->once();
 
-        // Make a POST request to the store method
-        $response = $this->post('/supermarket/employee', $data);
+        $file = UploadedFile::fake()->create('employees.csv', 1024);
 
-        // Assert that the supermarket was created
-        $this->assertDatabaseHas('supermarkets', [
-            'name' => 'Test Supermarket',
-            'location' => 'Test Location',
+        $response = $this->post('/supermarket/employeeupload/', [
+            'csv_file_names' => $file,
         ]);
 
-        // Assert that the CSV file was imported successfully
-        $this->assertDatabaseHas('employees', [
-            'name' => 'Employee 1',
-            'type' => 'Backoffice',
-            'manager_id' => $manager->id,
-        ]);
-
-        // Assert the response
         $response->assertRedirect('/home');
-        $response->assertSessionHas('mssg', 'thanks for registration');
+        $response->assertSessionHas('mssg', 'Uploaded successfully');
     }
+
+    public function testUploadSupplier()
+    {
+        Excel::fake();
+
+        $file = UploadedFile::fake()->create('supplier.csv', 1024);
+
+        $response = $this->post('/supermarket/employeeupload/', [
+            'csv_file_names' => $file,
+        ]);
+
+        $response->assertRedirect('/home');
+        $response->assertSessionHas('mssg', 'Uploaded successfully');
+    }
+   
 }

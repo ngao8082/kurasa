@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\EmployeesImport;
+use App\Imports\SupplierImport;
 use App\Models\Employees;
 use App\Models\Manager;
+use App\Models\Supplier;
 use App\Models\Supermarket;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Reader;
 
 class SupermarketController extends Controller
 {
     public function index()
     {
-        $Supermarket=Supermarket::orderBy('name', 'asc')->get();;
+        $manager= Manager::where('supermarket_id', '=',1)->firstOrFail();
+        $supplier= Supplier::where('supermarket_id', '=',2)->firstOrFail();
+        $Supermarket=Supermarket::orderBy('name', 'asc')->get();
 
-        return view('home', ['Supermarket' => $Supermarket]);
+        return view('home', ['Supermarket' => $Supermarket,'Manager'=>$manager, 'Supplier'=>$supplier]);
     }
 
     public function create()
@@ -56,10 +62,7 @@ class SupermarketController extends Controller
         return redirect('/home')->with('mssg', 'update successfully');
     }
 
-    public function addemployee()
-    {
-        return view('supermarket.employee');
-    }
+    
 
     public function destroy($id)
     {
@@ -68,39 +71,29 @@ class SupermarketController extends Controller
         return redirect('/home');
     }
 
-
-    public function importEmployees(Request $request)
+    public function addemployee()
     {
-        $file = $request->file('csv_file');
+        return view('supermarket.employee');
+    }
 
-        if ($file) {
-            $filePath = $file->getRealPath();
+    public function uploadEmployees(Request $request){
 
-            // Read the CSV file using a library like League/CSV
-            $csv = Reader::createFromPath($filePath, 'r');
-            $csv->setHeaderOffset(0);
+                Excel::import(new EmployeesImport, $request->file('csv_file_names'));
+               return redirect()->route('home')->with('mssg', 'Uploaded successfully');
 
-            foreach ($csv as $row) {
-                // Get the data from each row
-                $employeeName = $row['name'];
-                $employeeType = $row['type'];
-                $managerId = $row['manager_id'];
 
-                // Create or find the manager
-                $manager = Manager::findOrCreate(['id' => $managerId], ['name' => '']);
+    }
 
-                // Create the employee and associate it with the manager
-                $employee = new Employees();
-                $employee->name = $employeeName;
-                $employee->type = $employeeType;
-                $employee->manager()->associate($manager);
-                $employee->save();
-            }
+    public function addsupplier()
+    {
+        return view('supermarket.supplier');
+    }
 
-            return redirect()->back()->with('success', 'Employees imported successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Please provide a valid CSV file.');
+    public function uploadSupplier(Request $request){
+                        Excel::import(new SupplierImport, $request->file('csv_file_names'));
+                       return redirect()->route('home')->with('mssg', 'Uploaded successfully');
+        
+        
     }
 
 }
